@@ -1,0 +1,8 @@
+
+
+
+
+EVERY response:
+  result: "ok" | "err"
+  (if err) detail: String
+  (if ok) [any other fields]

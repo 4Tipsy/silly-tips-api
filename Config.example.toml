@@ -1,0 +1,6 @@
+# THIS IS EXAMPLE CONFIG FILE
+[Config]
+port = 1234
+mongodb_uri_string = "..."
+path_to_img_repo = "/better/be/abs"
+jwt_secret = "..."

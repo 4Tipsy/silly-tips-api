@@ -1,0 +1,5 @@
+/target
+/.vscode
+/IMG_REPO
+Config.toml
+Cargo.lock
