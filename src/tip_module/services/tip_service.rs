@@ -6,7 +6,7 @@ use chrono::Utc;
 
 // modules
 use crate::tip_module::tip_model::{TipLikeEntityModel, EntityTypeEnum};
-use crate::utils::gen_simple_hash;
+use crate::utils::simple_hashers::gen_simple_hash;
 use crate::DB;
 
 

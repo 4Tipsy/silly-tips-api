@@ -30,6 +30,7 @@ struct Config {
     mongodb_uri_string: String,
     path_to_img_repo: String,
     jwt_secret: String,
+    psw_secret: String,
 }
 
 

@@ -10,8 +10,8 @@ use std::path::Path as FsPath;
 // modules
 use crate::{DB, CONFIG};
 use crate::user_module::user_model::UserModel;
-use crate::utils::gen_num_hash;
-
+use crate::utils::simple_hashers::gen_num_hash;
+use crate::utils::hash_password::{verify_password, get_hashed_psw};
 
 
 
@@ -24,19 +24,24 @@ pub async fn get_user_by_login(user_email: &str, password: &str) -> Result<UserM
   // find user
   let user = users_collection.find_one(
     doc! {
-      "email": user_email,
-      "hashed_password": password,
+      "email": user_email
     },
     None
   ).await.expect("Error while connecting to DB");
 
-  // if not
+  // if no user found
   if user.is_none() {
     return Err("Invalid email or password");
   }
 
+  // verify password
+  let user_unwrapped = user.unwrap();
+  if !verify_password(password, &user_unwrapped.hashed_password) {
+    return Err("Invalid email or password");
+  }
+
   // if ok
-  Ok(user.unwrap())
+  Ok(user_unwrapped)
 }
 
 
@@ -81,7 +86,7 @@ pub async fn create_new_user(user_email: &str, password: &str, user_name: &str) 
     user_id: next_free_id.clone(),
     user_name: user_name.to_string(),
     email: user_email.to_string(),
-    hashed_password: password.to_string(),
+    hashed_password: get_hashed_psw(password),
     verified: false,
   };
 
