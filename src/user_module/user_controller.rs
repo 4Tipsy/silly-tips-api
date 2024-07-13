@@ -5,6 +5,7 @@ use rocket::response::{Responder, Result as ResponseResult};
 use rocket::serde::json::{json, Json, Value as JsonValue};
 use rocket::http::{Status, ContentType};
 use rocket::http::{Cookie, CookieJar};
+use rocket::fs::TempFile;
 
 use serde::Deserialize;
 use jsonwebtoken::{self, EncodingKey, Header};
@@ -77,7 +78,7 @@ pub async fn handle_login(req: Json<LoginReqBody>, jar: &CookieJar<'_>) -> ApiRe
 
 
     Err(err) => return ApiResponse {
-      json: json!({"result": "err", "error": err}),
+      json: json!({"result": "err", "detail": err}),
       status: Status::BadRequest,
     },
 
@@ -112,7 +113,7 @@ pub async fn handle_register(req: Json<RegisterReqBody>) -> ApiResponse {
     },
 
     Err(err) => return ApiResponse {
-      json: json!({"result": "err", "error": err}),
+      json: json!({"result": "err", "detail": err}),
       status: Status::BadRequest,
     }
 
@@ -128,7 +129,7 @@ pub async fn handle_register(req: Json<RegisterReqBody>) -> ApiResponse {
 
 #[get("/get-current-user")]
 pub async fn handle_get_current_user(auth: Auth) -> ApiResponse {
-  match user_service::get_current_user(auth.user_id).await {
+  match user_service::get_current_user(&auth.user_id).await {
 
     Ok(user) => return ApiResponse {
       json: json!({"result": "ok", "user": user}),
@@ -136,7 +137,30 @@ pub async fn handle_get_current_user(auth: Auth) -> ApiResponse {
     },
 
     Err(err) => return ApiResponse {
-      json: json!({"result": "err", "error": err}),
+      json: json!({"result": "err", "detail": err}),
+      status: Status::BadRequest,
+    }
+
+  };
+
+}
+
+
+
+
+
+#[post("/update-profile-img", data="<file>")]
+pub async fn handle_update_profile_img(auth: Auth, file: TempFile<'_>) -> ApiResponse {
+
+  match user_service::update_profile_img(&auth.user_id, file).await {
+
+    Ok(_) => return ApiResponse {
+      json: json!({"result": "ok"}),
+      status: Status::Ok,
+    },
+
+    Err(err) => return ApiResponse {
+      json: json!({"result": "err", "detail": err}),
       status: Status::BadRequest,
     }
 

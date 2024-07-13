@@ -51,7 +51,37 @@ pub async fn handle_create_new_folder(req: Json<CreateNewFolderBody>, auth: Auth
     },
 
     Err(err) => return ApiResponse {
-      json: json!({"result": "err", "error": err}),
+      json: json!({"result": "err", "detail": err}),
+      status: Status::BadRequest,
+    }
+
+  };
+
+}
+
+
+
+
+
+
+
+#[derive(Deserialize)]
+pub struct RenameFolderBody {
+  new_name: String,
+  entity_id: String,
+}
+
+#[post("/rename-folder", data="<req>")]
+pub async fn handle_rename_folder(req: Json<RenameFolderBody>, auth: Auth) -> ApiResponse {
+  match folder_service::rename_folder(&req.new_name, &req.entity_id, &auth.user_id).await {
+
+    Ok(_) => return ApiResponse {
+      json: json!({"result": "ok"}),
+      status: Status::Ok,
+    },
+
+    Err(err) => return ApiResponse {
+      json: json!({"result": "err", "detail": err}),
       status: Status::BadRequest,
     }
 
@@ -82,7 +112,7 @@ pub async fn handle_get_folder_contents(req: Json<GetFolderContentsBody>, auth: 
     },
 
     Err(err) => return ApiResponse {
-      json: json!({"result": "err", "error": err}),
+      json: json!({"result": "err", "detail": err}),
       status: Status::BadRequest,
     }
 

@@ -96,6 +96,35 @@ pub async fn handle_modify_tip(req: Json<ModifyTipBody>, auth: Auth) -> ApiRespo
 
 
 #[derive(Deserialize)]
+pub struct RenameTipBody {
+  new_name: String,
+  entity_id: String,
+}
+
+#[post("/rename-tip", data="<req>")]
+pub async fn handle_rename_tip(req: Json<RenameTipBody>, auth: Auth) -> ApiResponse {
+  match tip_service::rename_tip(&req.new_name, &req.entity_id, &auth.user_id).await {
+
+    Ok(_) => return ApiResponse {
+      json: json!({"result": "ok"}),
+      status: Status::Ok,
+    },
+
+    Err(err) => return ApiResponse {
+      json: json!({"result": "err", "error": err}),
+      status: Status::BadRequest,
+    }
+
+  };
+
+}
+
+
+
+
+
+
+#[derive(Deserialize)]
 pub struct DeleteTipBody {
   entity_id: String,
 }

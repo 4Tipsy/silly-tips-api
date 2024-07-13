@@ -14,9 +14,9 @@ mod user_module;
 mod tip_module;
 mod guards;
 mod utils;
-use crate::user_module::user_controller::{handle_login, handle_register, handle_get_current_user};
-use crate::tip_module::controllers::tip_controller::{handle_create_tip, handle_modify_tip, handle_delete_tip, handle_get_tip_content};
-use crate::tip_module::controllers::folder_controller::{handle_create_new_folder, handle_get_folder_contents};
+use crate::user_module::user_controller::{handle_login, handle_register, handle_get_current_user, handle_update_profile_img};
+use crate::tip_module::controllers::tip_controller::{handle_create_tip, handle_modify_tip, handle_rename_tip, handle_delete_tip, handle_get_tip_content};
+use crate::tip_module::controllers::folder_controller::{handle_create_new_folder, handle_rename_folder, handle_get_folder_contents};
 
 
 
@@ -83,9 +83,9 @@ async fn rocket() -> _ {
             .merge(("port", &CONFIG.port))
         )
         .mount("/api/", routes![
-            handle_login, handle_register, handle_get_current_user,
-            handle_create_tip, handle_modify_tip, handle_delete_tip, handle_get_tip_content,
-            handle_create_new_folder, handle_get_folder_contents,
+            handle_login, handle_register, handle_get_current_user, handle_update_profile_img,
+            handle_create_tip, handle_modify_tip, handle_rename_tip, handle_delete_tip, handle_get_tip_content,
+            handle_create_new_folder, handle_rename_folder, handle_get_folder_contents,
             ])
         .register("/", catchers![handle_400, handle_500])
 

@@ -23,7 +23,7 @@ pub async fn create_new_folder(new_folder_name: &str, parent_id: Option<String>,
     // check if folder with such name exists
     let existing_one = tips_collection.find_one(
       doc! {
-        "tip_name": &new_folder_name,
+        "name": &new_folder_name,
         "parent_id": &parent_id,
         "owner_id": &user_id,
       },
@@ -31,7 +31,7 @@ pub async fn create_new_folder(new_folder_name: &str, parent_id: Option<String>,
     ).await.expect("Error while connecting to DB");
   
     if existing_one.is_some() {
-      return Err("Tip with such name already exists");
+      return Err("Folder with such name already exists");
     }
 
 
@@ -70,6 +70,44 @@ pub async fn create_new_folder(new_folder_name: &str, parent_id: Option<String>,
 
 
 }
+
+
+
+
+
+
+pub async fn rename_folder(new_name: &str, entity_id: &str, user_id: &str) -> Result<(), &'static str> {
+
+  let db = DB.get().unwrap();
+  let tips_collection = db.collection::<TipLikeEntityModel>("tips");
+
+
+  // check if folder with such name exists
+  let existing_folder = tips_collection.find_one_and_delete(
+    doc! {
+      "entity_id": &entity_id,
+      "owner_id": &user_id,
+    },
+    None
+  ).await.expect("Error while connecting to DB");
+
+  if existing_folder.is_none() {
+    return Err("No such folder");
+  }
+
+
+  // update
+  let mut folder_entity = existing_folder.unwrap();
+  folder_entity.name = new_name.to_string();
+  match tips_collection.insert_one(folder_entity, None).await {
+
+    Ok(_) => return Ok(()),
+
+    Err(_) => return Err("Failed to rename folder")
+  };
+
+}
+
 
 
 

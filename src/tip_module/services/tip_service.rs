@@ -116,6 +116,40 @@ pub async fn modify_tip(new_content: &str, entity_id: &str, user_id: &str) -> Re
 
 
 
+pub async fn rename_tip(new_name: &str, entity_id: &str, user_id: &str) -> Result<(), &'static str> {
+
+  let db = DB.get().unwrap();
+  let tips_collection = db.collection::<TipLikeEntityModel>("tips");
+
+
+  // check if folder with such name exists
+  let existing_tip = tips_collection.find_one_and_delete(
+    doc! {
+      "entity_id": &entity_id,
+      "owner_id": &user_id,
+    },
+    None
+  ).await.expect("Error while connecting to DB");
+
+  if existing_tip.is_none() {
+    return Err("No such tip");
+  }
+
+
+  // update
+  let mut tip_entity = existing_tip.unwrap();
+  tip_entity.name = new_name.to_string();
+  match tips_collection.insert_one(tip_entity, None).await {
+
+    Ok(_) => return Ok(()),
+
+    Err(_) => return Err("Failed to rename tip")
+  };
+
+}
+
+
+
 
 
 pub async fn delete_tip(entity_id: &str, user_id: &str) -> Result<(), &'static str> {

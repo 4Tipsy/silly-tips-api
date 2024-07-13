@@ -1,5 +1,7 @@
 
+use rocket::fs::TempFile;
 use mongodb::bson::doc;
+
 
 use std::fs;
 use std::path::Path as FsPath;
@@ -113,7 +115,7 @@ pub async fn create_new_user(user_email: &str, password: &str, user_name: &str) 
 
 
 
-pub async fn get_current_user(user_id: String) -> Result<UserModel, &'static str> {
+pub async fn get_current_user(user_id: &str) -> Result<UserModel, &'static str> {
 
   let db = DB.get().unwrap();
   let users_collection = db.collection::<UserModel>("users");
@@ -136,4 +138,23 @@ pub async fn get_current_user(user_id: String) -> Result<UserModel, &'static str
 
   // if ok
   Ok(user_unwrapped)
+}
+
+
+
+
+
+pub async fn update_profile_img(user_id: &str, mut file: TempFile<'_>)  -> Result<(), &'static str> {
+
+  let save_to = FsPath::new("").join( &CONFIG.path_to_img_repo ).join(&user_id).join("__profile_img");
+
+  
+  match file.persist_to(save_to).await {
+
+    Ok(_) => return Ok(()),
+
+    Err(_) => return Err("Failed to update profile image")
+
+  }
+  
 }
