@@ -21,10 +21,6 @@ pub fn gen_num_hash(length: u8) -> String {
 
 
 
-
-
-
-
 pub fn gen_simple_hash(length: u8) -> String {
     let mut rng = rand::thread_rng();
     let charset: Vec<char> = (b'a'..=b'z')

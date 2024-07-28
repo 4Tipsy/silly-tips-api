@@ -36,7 +36,7 @@ struct Config {
 
 static CONFIG: Lazy<Config> = Lazy::new(
     || {
-        #[derive(Deserialize)] struct _C { Config: Config } // config = config['Config']
+        #[derive(Deserialize)] struct _C { Config: Config } // config <- config['Config']
         let raw_config_string = fs::read_to_string("Config.toml").expect("Error reading Config.toml");
         let _config: _C = toml::from_str(&raw_config_string).unwrap();
         _config.Config
